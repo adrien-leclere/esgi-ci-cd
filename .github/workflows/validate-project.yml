@@ -4,7 +4,7 @@ on:
   push:
 
 jobs:
-  validate:
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Récupérer le code source
