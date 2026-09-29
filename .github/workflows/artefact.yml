@@ -1,0 +1,58 @@
+name: Production d'un artefact
+
+on:
+  workflow_dispatch: # Permet de déclencher le workflow manuellement depuis l'onglet "Actions" de GitHub
+
+jobs:
+  artefact:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Récupérer le code source
+      uses: actions/checkout@v7
+
+    - name: Préparer l'environnement
+      uses: actions/setup-node@v7
+      with:
+        node-version: 26.10.0
+
+    - name: Mise en place du cache
+      uses: actions/cache@v5
+      with:
+        path: ~/.npm # Dossier à mettre en cache (le cache npm)
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }} # Clé du cache : change si l'OS ou le package-lock.json change
+
+    - name: Installer les dépendances
+      run: npm ci
+
+    - name: Lancer un build
+      run: npm run build
+
+    - name: Vérification de l'existence du dossier dist
+      run: |
+        if [ ! -d "dist" ]; then
+          echo "Le dossier dist n'existe pas. Le build a échoué."
+          exit 1
+        fi
+
+    - name: Sauvegarder le dossier dist en tant qu'artefact
+      uses: actions/upload-artifact@v7
+      with:
+        name: build-artifact
+        path: dist
+
+    - name: Résumé du build
+      run: |
+        {
+          echo "## Résultat du build"
+          echo "✅ Build généré et sauvegardé en tant qu'artefact \`build-artifact\`."
+          echo ""
+          echo "| Info | Valeur |"
+          echo "|---|---|"
+          echo "| Branche | \`${{ github.ref_name }}\` |"
+          echo "| Commit | \`${{ github.sha }}\` |"
+          echo "| Déclenché par | ${{ github.actor }} |"
+          echo "| Node | $(node -v) |"
+          echo "| npm | $(npm -v) |"
+          echo "| Taille de dist | $(du -sh dist | cut -f1) |"
+          echo "| Nombre de fichiers | $(find dist -type f | wc -l) |"
+        } >> $GITHUB_STEP_SUMMARY
