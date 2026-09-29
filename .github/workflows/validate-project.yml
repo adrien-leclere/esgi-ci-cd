@@ -1,35 +1,40 @@
-name: validate project
+name: validate project # Nom du workflow affiché dans l'onglet "Actions" de GitHub
 
-on:
-  push:
+on: # Événements qui déclenchent le workflow
+  push: # Le workflow se lance à chaque push, sur n'importe quelle branche
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Récupérer le code source
-      uses: actions/checkout@v7
+jobs: # Liste des jobs du workflow (ils tournent en parallèle par défaut)
+  build: # Nom du job (Aurais pu être validate)
+    runs-on: ubuntu-24.04 # Versions du système d'exploitation sur lequel le job sera exécuté
+    steps: # Parties avec les différentes étapes
+    - name: Récupérer le code source # Nom de l'étape affiché dans les logs
+      uses: actions/checkout@v7 # Utilise une action toute faite (ici : clone le dépôt dans le runner)
 
     - name: Installer les dépendances
       uses: actions/setup-node@v7
-      with:
-        node-version: 26.10.0
+      with: # Paramètres passés à l'action utilisée
+        node-version: 26.10.0 # Version de Node.js à installer
 
     - name: Mise en place du cache
       uses: actions/cache@v5
       with:
-        path: ~/.npm
-        key: npm-${{ hashFiles('**/package-lock.json') }}
+        path: ~/.npm # Dossier à mettre en cache (le cache npm)
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }} # Clé du cache : change si l'OS ou le package-lock.json change
 
     - name: Installer les dépendances du projet
-      run: npm ci
+      run: npm ci # Exécute une commande shell (npm ci = installation propre basée sur package-lock.json)
 
     - name: Lancer les tests
       run: npm test
 
+      if: always() # Cette condition permet d'exécuter l'étape même si les étapes précédentes ont échoué
+
     - name: Status de la validation
       run: echo "Validation terminée avec succès"
 
-    - run: |
+
+    - run: | # Le "|" permet d'écrire plusieurs commandes sur plusieurs lignes
         echo "## Résultat des tests" > $GITHUB_STEP_SUMMARY
         echo "✅ Tous les tests sont passés" > $GITHUB_STEP_SUMMARY
+
+
