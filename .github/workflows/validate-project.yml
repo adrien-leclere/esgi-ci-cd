@@ -1,0 +1,30 @@
+name: validate project
+
+on:
+  push:
+
+jobs:
+  steps:
+    - name: Récupérer le code source
+      uses: actions/checkout@v7
+
+    - name: Installer les dépendances
+      uses: actions/setup-node@v7
+      with:
+        node-version: 26.10.0
+
+    - name: Mise en place du cache
+      uses: actions/cache@v5
+
+    - name: Installer les dépendances du projet
+      run: npm install
+
+    - name: Lancer les tests
+      run: npm test
+
+    - name: Status de la validation
+      run: echo "Validation terminée avec succès"
+
+    - run: |
+      echo "## Résultat des tests" > $GITHUB_STEP_SUMMARY
+      echo "✅ Tous les tests sont passés" > $GITHUB_STEP_SUMMARY
