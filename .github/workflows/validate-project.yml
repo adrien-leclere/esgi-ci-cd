@@ -4,7 +4,9 @@ on:
   push:
 
 jobs:
-  steps:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
     - name: Récupérer le code source
       uses: actions/checkout@v7
 
