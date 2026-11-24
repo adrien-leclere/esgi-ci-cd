@@ -1,4 +1,4 @@
-name: validate project # Nom du workflow affiché dans l'onglet "Actions" de GitHub
+name: validée un projet # Nom du workflow affiché dans l'onglet "Actions" de GitHub
 
 on: # Événements qui déclenchent le workflow
   push: # Le workflow se lance à chaque push, sur n'importe quelle branche

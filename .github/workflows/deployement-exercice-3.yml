@@ -84,7 +84,7 @@ jobs:
 
   deploy:
     needs: tests # Attend la réussite de toute la matrice
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: ${{ inputs.environment }}
       url: ${{ vars.API_URL }}
